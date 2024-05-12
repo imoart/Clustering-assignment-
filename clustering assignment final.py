@@ -6,6 +6,7 @@ import sklearn.metrics as skmet
 import sklearn.preprocessing as pp
 from scipy.optimize import curve_fit
 import scipy.optimize as opt
+import errors as err
 
 # Read the data into a pandas DataFrame
 data = pd.read_csv("climatedatacombinednew.csv")
@@ -323,6 +324,7 @@ print(df_norm7)
 print(df_norm8)
 print(df_norm9)
 
+'''
 #calculate silhouette score for 2 to 10 clusters
 for ic in range(2, 11):
     score = one_silhoutte(df_norm1, ic)
@@ -539,19 +541,63 @@ plt.xlabel("Co2emissions Last 15 Years")
 plt.ylabel("Electricity Last 15 Years")
 plt.grid(True)
 plt.show() 
+'''
 
-def logistic(t, n0, g, t0):
-    """Calculates the logistic function with scale factor n0 and growth rate g"""
-    f = n0 / (1 + np.exp(-g*(t - t0)))
+
+
+#Curve fitting 
+df_co2 = pd.read_excel('Co2.xlsx')
+print(df_co2)
+
+def poly(x, a, b, c, d, e):
+    """ Calculates polynomial """
+    x = x - 1990
+    f = a + b*x + c*x**2 + d*x**3 + e*x**4
     return f
 
-bounds = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
-param, covar = opt.curve_fit(logistic, co2mid15["mean_value"], forestmid15["mean_value"], bounds=bounds)
+def deriv(x, func, parameter, i):
+    """
+    Calculates the derivative of the function with respect to the i-th parameter.
+    """
+    h = 1e-6
+    old_param = parameter[i]
+    parameter[i] = old_param + h
+    plus = func(x, *parameter)
+    parameter[i] = old_param - h
+    minus = func(x, *parameter)
+    parameter[i] = old_param
+    return (plus - minus) / (2 * h)
 
-print(param)
-print(covar)
+# Extract the year and co2mean columns
+year = df_co2["Year"].values
+co2mean = df_co2["co2mean"].values
 
-forestmid15["trial"] = logistic(forestmid15["Year"], 3e12, 0.10, 1990)
-forestmid15.plot("mean_value", "trial")
+# Fit the polynomial function to the data
+param, covar = curve_fit(poly, year, co2mean)
+
+# Forecasting
+forecast_years = np.arange(1960, 2031)
+forecast = poly(forecast_years, *param)
+
+# Calculate uncertainty
+sigma = err.error_prop(forecast_years, poly, param, covar)
+low = forecast - sigma
+up = forecast + sigma
+
+# Add the fitted values to the DataFrame
+df_co2["fit"] = poly(df_co2["Year"], *param)
+
+# Plot the data, fitted curve, and forecast with uncertainty
+plt.figure(figsize=(10, 6))
+plt.scatter(year, co2mean, label='CO2 Emissions Data')
+plt.plot(df_co2["Year"], df_co2["fit"], label='Fitted Curve')
+plt.plot(forecast_years, forecast, label='Forecast')
+plt.fill_between(forecast_years, low, up, color="yellow", alpha=0.7, label='Uncertainty Range')
+plt.xlabel("Year")
+plt.ylabel("CO2 Emissions")
+plt.title("CO2 Emissions over Time")
+plt.legend()
 plt.show()
+
+
 
