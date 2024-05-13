@@ -20,16 +20,7 @@ electric_power_consumption_df = data[data["Indicator Name"] == "Electric power c
 forest_area_df = data[data["Indicator Name"] == "Forest area (sq. km)"]
 agricultural_land_df = data[data["Indicator Name"] == "Agricultural land (sq. km)"]
 
-'''
-# Save each DataFrame to a separate CSV file
-population_total_df.to_csv("population_total.csv", index=False)
-population_growth_df.to_csv("population_growth.csv", index=False)
-mortality_rate_df.to_csv("mortality_rate.csv", index=False)
-co2_emissions_df.to_csv("co2_emissions.csv", index=False)
-electric_power_consumption_df.to_csv("electric_power_consumption.csv", index=False)
-forest_area_df.to_csv("forest_area.csv", index=False)
-agricultural_land_df.to_csv("agricultural_land.csv", index=False)'''
-
+# Reading files with changes 
 population_total_df = pd.read_csv('population_total.csv')
 population_growth_df = pd.read_csv("population_growth.csv")
 mortality_rate_df = pd.read_csv("mortality_rate.csv")
@@ -52,9 +43,7 @@ for i, df in enumerate(dfs):
 
     # Save the modified DataFrame back to the same variable
     dfs[i] = df
-''''
-population_growth_df = population_growth_df.drop(population_growth_df.columns[1], axis=1)
-'''
+
 # List of all DataFrames
 dfs = [population_total_df, population_growth_df, mortality_rate_df, co2_emissions_df, 
        electric_power_consumption_df, forest_area_df, agricultural_land_df]
@@ -103,23 +92,13 @@ tick_positions = list(range(len(df_combo.columns)))
 tick_labels = df_combo.columns
 plt.xticks(tick_positions, tick_labels, rotation=30)
 plt.yticks(tick_positions, tick_labels, rotation=0)
+plt.savefig('heatmapcluster.png')
 plt.show()
 
 
-#pd.plotting.scatter_matrix(df_combo, figsize=(10, 10), s=10)
-#plt.show()
-
-
-'''
-# For the first 15 years (1990-2004)
-poptfirst15 = population_total_df.loc[:, '1990':'2004']
-popgfirst15 = population_growth_df.loc[:, '1990':'2004']
-mortfirst15 = mortality_rate_df.loc[:, '1990':'2004']
-co2first15 = co2_emissions_df.loc[:, '1990':'2004']
-electricfirst15 = electric_power_consumption_df.loc[:, '1990':'2004']
-forestfirst15 = forest_area_df.loc[:, '1990':'2004']
-agrifirst15 = agricultural_land_df.loc[:, '1990':'2004']
-'''
+pd.plotting.scatter_matrix(df_combo, figsize=(10, 10), s=10)
+plt.savefig('pairplotcluster.png')
+plt.show()
 
 # For the middle 15 years (2005-2019)
 poptmid15 = population_total_df.loc[:, '1990':'2004']
@@ -137,22 +116,6 @@ co2rec15 = co2_emissions_df.loc[:, '2005':'2020']
 electricrec15 = electric_power_consumption_df.loc[:, '2005':'2020']
 forestrec15 = forest_area_df.loc[:, '2005':'2020']
 agrirec15 = agricultural_land_df.loc[:, '2005':'2020']
-
-#%%
-#print(poptfirst15)
-#print(poptmid15)
-#print(poptrec15)
-
-'''
-# For the first 15 years (1990-2004)
-poptfirst15['mean_value'] = poptfirst15.mean(axis=1)
-popgfirst15['mean_value'] = popgfirst15.mean(axis=1)
-mortfirst15['mean_value'] = mortfirst15.mean(axis=1)
-co2first15['mean_value'] = co2first15.mean(axis=1)
-electricfirst15['mean_value'] = electricfirst15.mean(axis=1)
-forestfirst15['mean_value'] = forestfirst15.mean(axis=1)
-agrifirst15['mean_value'] = agrifirst15.mean(axis=1)
-'''
 
 # For the middle 15 years (2005-2019)
 poptmid15['mean_value'] = poptmid15.mean(axis=1)
@@ -196,13 +159,6 @@ df_comborec15['forestrec15_mean'] = forestrec15['mean_value']
 # Print or use df_comborec15 as needed
 print(df_comborec15)
 
-'''
-df_co2first15 = co2first15['mean_value']
-df_electricfirst15 = electricfirst15['mean_value']
-df_forestfirst15 = forestfirst15['mean_value'] 
-df_agrifirst15 = agrifirst15['mean_value']
-'''
-
 df_co2mid15 = co2mid15['mean_value']
 df_electricmid15 = electricmid15['mean_value']
 df_forestmid15 = forestmid15['mean_value'] 
@@ -215,14 +171,6 @@ df_agrirec15 = agrirec15['mean_value']
 
 print(df_co2mid15)
 print(df_co2rec15)
-
-plt.figure(figsize=(10,6))
-plt.scatter(df_co2mid15, df_forestmid15)
-plt.scatter(df_co2rec15, df_forestrec15)
-plt.xlabel('Mean')
-plt.ylabel('Range')
-plt.grid(True)
-plt.show()
 
 
 # Setup scaler objects
@@ -244,23 +192,25 @@ df_norm3 = scaler3.fit_transform(df_clust3)
 print(df_norm1)
 print(df_norm2)
 print(df_norm3)
-'''
+
 plt.figure(figsize=(8, 8))
 plt.scatter(df_norm1[:,0], df_norm1[:, 1], 10, marker="o")
 plt.xlabel("CO2 emissions")
 plt.ylabel("Forest Area")
+plt.title("Scatter Plot: CO2 emissions vs Agriculture")
+plt.grid(True)
+plt.savefig('Co2 vs forest combo.png')
 plt.show()
-'''
-'''
+
 # Create scatter plot for CO2 emissions and agriculture
 plt.figure(figsize=(8, 6))
 plt.scatter(df_norm2[:, 0], df_norm2[:, 1], 10, marker="o")
 plt.xlabel("CO2 emissions")
 plt.ylabel("Agriculture")
 plt.title("Scatter Plot: CO2 emissions vs Agriculture")
-plt.grid?(True)
+plt.grid(True)
+plt.savefig('Co2 vs agri combo.png')
 plt.show()
-
 
 # Create scatter plot for CO2 emissions and electric
 plt.figure(figsize=(8, 6))
@@ -269,8 +219,8 @@ plt.xlabel("CO2 emissions")
 plt.ylabel("Electric")
 plt.title("Scatter Plot: CO2 emissions vs Electric")
 plt.grid(True)
+plt.savefig('Co2 vs electric combo.png')
 plt.show()
-'''
 
 def one_silhoutte(xy, n):
     """ Calculates silhoutte score for n clusters """
@@ -303,7 +253,6 @@ print(df_norm4)
 print(df_norm5)
 print(df_norm6)
 
-
 # Extract columns from all DataFrames
 df_clust7 = df_comborec15[["co2rec15_mean", "forestrec15_mean"]]
 df_clust8 = df_comborec15[["co2rec15_mean", "agrirec15_mean"]]
@@ -324,7 +273,6 @@ print(df_norm7)
 print(df_norm8)
 print(df_norm9)
 
-'''
 #calculate silhouette score for 2 to 10 clusters
 for ic in range(2, 11):
     score = one_silhoutte(df_norm1, ic)
@@ -456,96 +404,113 @@ plt.figure(figsize=(8.0, 8.0))
 # plot data with kmeans cluster number
 plt.scatter(x1, y1, 10, labels1, marker="o")
 # show cluster centres
-plt.scatter(xkmeans1, ykmeans1, 45, "k", marker="d")
+plt.scatter(xkmeans1, ykmeans1, 45, c='cyan', marker="d")
 plt.xlabel("Co2emissions")
 plt.ylabel("Forest Area")
+plt.title('Co2 Emissions Vs Forest Area')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 vs forest.png')
 plt.show() 
 
 plt.figure(figsize=(8.0, 8.0))
 # plot data with kmeans cluster number
 plt.scatter(x2, y2, 10, labels2, marker="o", cmap='winter')
 # show cluster centres
-plt.scatter(xkmeans2, ykmeans2, 45, "k", marker="d")
+plt.scatter(xkmeans2, ykmeans2, 45, c='cyan', marker="d")
 plt.xlabel("Co2emissions")
 plt.ylabel("Agriculture")
+plt.title('Co2 Emissions Vs Agricultural Land')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 vs agri.png')
 plt.show() 
 
 plt.figure(figsize=(8.0, 8.0))
 # plot data with kmeans cluster number
 plt.scatter(x3, y3, 10, labels3, marker="o", cmap='viridis')
 # show cluster centres
-plt.scatter(xkmeans3, ykmeans3, 45, "k", marker="d")
+plt.scatter(xkmeans3, ykmeans3, 45, c='cyan', marker="d")
 plt.xlabel("Co2emissions")
-plt.ylabel("Electricity")
+plt.ylabel("Electricity Consumption")
+plt.title('Co2 Emissions Vs Electric Consumption')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 vs electric.png')
 plt.show() 
 
 plt.figure(figsize=(8.0, 8.0))
 # plot data with kmeans cluster number
 plt.scatter(x4, y4, 10, labels4, marker="o", cmap='plasma')
 # show cluster centres
-plt.scatter(xkmeans5, ykmeans5, 45, "k", marker="d")
+plt.scatter(xkmeans5, ykmeans5, 45, c='cyan', marker="d")
 plt.xlabel("Co2emissions First 15 Years")
 plt.ylabel("Forest Area First 15 Years")
+plt.title('Co2 Emissions firts 15 years Vs Forest Area first 15 years')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 first 15 vs forest.png')
 plt.show() 
 
 plt.figure(figsize=(8.0, 8.0))
 # plot data with kmeans cluster number
 plt.scatter(x5, y5, 10, labels5, marker="o", cmap='inferno')
 # show cluster centres
-plt.scatter(xkmeans5, ykmeans5, 45, "k", marker="d")
+plt.scatter(xkmeans5, ykmeans5, 45, c='cyan', marker="d")
 plt.xlabel("Co2emissions First 15 Years")
 plt.ylabel("Agriculture First 15 Years")
+plt.title('Co2 Emissions firts 15 years Vs Agricultural Land first 15 years')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 first 15 vs agri.png')
 plt.show() 
 
 plt.figure(figsize=(8.0, 8.0))
 # plot data with kmeans cluster number
 plt.scatter(x6, y6, 10, labels6, marker="o", cmap='magma')
-# show cluster centres
-plt.scatter(xkmeans6, ykmeans6, 45, "k", marker="d")
+plt.scatter(xkmeans6, ykmeans6, 45, c='cyan', marker="d")
 plt.xlabel("Co2emissions First 15 Years")
-plt.ylabel("Electricity First 15 Years")
+plt.ylabel("Electricity Consumption First 15 Years")
+plt.title('Co2 Emissions firts 15 years Vs Electric Consumption first 15 years')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 first 15 vs electric.png')
 plt.show() 
 
 plt.figure(figsize=(8.0, 8.0))
-# plot data with kmeans cluster number
 plt.scatter(x7, y7, 10, labels7, marker="o", cmap='cool')
-# show cluster centres
 plt.scatter(xkmeans7, ykmeans7, 45, "k", marker="d")
 plt.xlabel("Co2emissions Last 15 Years")
 plt.ylabel("Forest Area Last 15 Years")
+plt.title('Co2 Emissions last 15 years Vs Forest Area last 15 years')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 last 15 vs forest.png')
 plt.show() 
 
 plt.figure(figsize=(8.0, 8.0))
-# plot data with kmeans cluster number
 plt.scatter(x8, y8, 10, labels8, marker="o", cmap='hot')
-# show cluster centres
-plt.scatter(xkmeans8, ykmeans8, 45, "k", marker="d")
+plt.scatter(xkmeans8, ykmeans8, 45, c='cyan', marker="d")
 plt.xlabel("Co2emissions Last 15 Years")
-plt.ylabel("Agriculture Last 15 Years")
+plt.ylabel("Agriculture Land Last 15 Years")
+plt.title('Co2 Emissions last 15 years Vs Agricultural Land last 15 years')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 last 15 vs agriculture.png')
 plt.show() 
 
 plt.figure(figsize=(8.0, 8.0))
-# plot data with kmeans cluster number
 plt.scatter(x9, y9, 10, labels9, marker="o", cmap='spring')
-# show cluster centres
 plt.scatter(xkmeans9, ykmeans9, 45, "k", marker="d")
 plt.xlabel("Co2emissions Last 15 Years")
-plt.ylabel("Electricity Last 15 Years")
+plt.ylabel("Electricity Consumption Last 15 Years")
+plt.title('Co2 Emissions last 15 years Vs Electric Consumption last 15 years')
+plt.legend()
 plt.grid(True)
+plt.savefig('Co2 last 15 vs electric.png')
 plt.show() 
-'''
 
-
-
-#Curve fitting 
+# Curve fitting 
 df_co2 = pd.read_excel('Co2.xlsx')
 print(df_co2)
 
@@ -555,49 +520,24 @@ def poly(x, a, b, c, d, e):
     f = a + b*x + c*x**2 + d*x**3 + e*x**4
     return f
 
-def deriv(x, func, parameter, i):
-    """
-    Calculates the derivative of the function with respect to the i-th parameter.
-    """
-    h = 1e-6
-    old_param = parameter[i]
-    parameter[i] = old_param + h
-    plus = func(x, *parameter)
-    parameter[i] = old_param - h
-    minus = func(x, *parameter)
-    parameter[i] = old_param
-    return (plus - minus) / (2 * h)
-
-# Extract the year and co2mean columns
-year = df_co2["Year"].values
-co2mean = df_co2["co2mean"].values
-
-# Fit the polynomial function to the data
-param, covar = curve_fit(poly, year, co2mean)
-
-# Forecasting
-forecast_years = np.arange(1960, 2031)
-forecast = poly(forecast_years, *param)
-
-# Calculate uncertainty
-sigma = err.error_prop(forecast_years, poly, param, covar)
+param, covar = opt.curve_fit(poly, df_co2["Year"], df_co2["forestmean"])
+sigma = np.sqrt(np.diag(covar))
+print(sigma)
+year = np.arange(1990, 2031)
+forecast = poly(year, *param)
+sigma = err.error_prop(year, poly, param, covar)
 low = forecast - sigma
 up = forecast + sigma
-
-# Add the fitted values to the DataFrame
 df_co2["fit"] = poly(df_co2["Year"], *param)
-
-# Plot the data, fitted curve, and forecast with uncertainty
-plt.figure(figsize=(10, 6))
-plt.scatter(year, co2mean, label='CO2 Emissions Data')
-plt.plot(df_co2["Year"], df_co2["fit"], label='Fitted Curve')
-plt.plot(forecast_years, forecast, label='Forecast')
-plt.fill_between(forecast_years, low, up, color="yellow", alpha=0.7, label='Uncertainty Range')
+plt.figure(figsize=(10,6))
+plt.plot(df_co2["Year"], df_co2["forestmean"], label="Forest Area")
+plt.plot(year, forecast, label="forecast")
+# plot uncertainty range
+plt.fill_between(year, low, up, color="yellow", alpha=0.7)
 plt.xlabel("Year")
-plt.ylabel("CO2 Emissions")
-plt.title("CO2 Emissions over Time")
+plt.ylabel("Forest Area")
+plt.grid(True)
 plt.legend()
+plt.title('Forest Area Over 40 Years')
+plt.savefig('Forest Area over 40 years.png')
 plt.show()
-
-
-
